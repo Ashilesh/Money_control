@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
 
                decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('assets/photos/beach_2.jpg'),
+                    image: AssetImage('assets/photos/beach_2_low.jpg'),
                   fit: BoxFit.cover)),
                 child: SafeArea(
                   child: Column(
