@@ -1,9 +1,10 @@
 //this file is for welcome page
 //in which user will see this page only once
-//when the app starts
+//when the app starts for first time
 
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'home.dart';
 
 class MyApp extends StatelessWidget {
 
@@ -19,7 +20,10 @@ class MyApp extends StatelessWidget {
 
           // floating action button
           floatingActionButton: FloatingActionButton(
-           onPressed: null,
+           onPressed : (){
+             print('click');
+            Navigator.push(context, new MaterialPageRoute(builder: (context) => Home()));
+           },
            backgroundColor: Colors.grey[700],
            foregroundColor: Colors.grey[50],
               child: Icon(
