@@ -4,6 +4,6 @@ import 'home.dart';
 
 
 void main() => runApp(MaterialApp(
-  home: new MyApp(),
+  home: MyApp(),
 ));
 

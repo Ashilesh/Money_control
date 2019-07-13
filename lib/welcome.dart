@@ -5,6 +5,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'home.dart';
+import 'package:flutter/cupertino.dart';
 
 class MyApp extends StatelessWidget {
 
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
           floatingActionButton: FloatingActionButton(
            onPressed : (){
              print('click');
-            Navigator.push(context, new MaterialPageRoute(builder: (context) => Home()));
+            Navigator.push(context, new CupertinoPageRoute(builder: (context) => Home()));
            },
            backgroundColor: Colors.grey[700],
            foregroundColor: Colors.grey[50],
