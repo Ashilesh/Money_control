@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class friend_info extends StatefulWidget {
@@ -11,17 +12,17 @@ class _friend_infoState extends State<friend_info> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     var cherryTomato = const Color(0xffe94b3c);
+    var blackColor = const Color(0xff2d2926);
     return Scaffold(
 
       body: CustomScrollView(
         slivers: <Widget>[
            SliverAppBar(
-            pinned: false,
-
-            expandedHeight: height - 100,
+            pinned: true,
+            expandedHeight: height,
 
             bottom: PreferredSize(
-              preferredSize: Size.fromHeight(103),
+              preferredSize: Size.fromHeight(143),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
@@ -40,7 +41,7 @@ class _friend_infoState extends State<friend_info> {
                   Row(
                     textDirection: TextDirection.rtl,
                     children: <Widget>[
-                      Text('540 \u20B9',
+                      Text('- \u20B9 540',
                         style: TextStyle(
                             color: Colors.white,
                             fontFamily: "OpenSans",
@@ -58,7 +59,7 @@ class _friend_infoState extends State<friend_info> {
                         child: FlatButton(
                           child: Text('Give',
                             style: TextStyle(
-                                color: Colors.green,
+                                color: cherryTomato,
                                 fontFamily: "OpenSans",
                                 fontSize: 30
                             ),
@@ -70,7 +71,7 @@ class _friend_infoState extends State<friend_info> {
                         child: FlatButton(
                           child: Text('Take',
                             style: TextStyle(
-                                color: cherryTomato,
+                                color: Colors.green,
                                 fontFamily: "OpenSans",
                                 fontSize: 30
                             ),
@@ -82,6 +83,25 @@ class _friend_infoState extends State<friend_info> {
                   ),
                   Container(
                     height: 10,
+                  ),
+                  Container(
+                      alignment: Alignment.center,
+
+                      color: Colors.transparent,
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: ClipRRect(
+                                borderRadius: BorderRadius.only(topRight: Radius.circular(30),topLeft: Radius.circular(30)),
+
+                                child: Container(
+                                  height: 40,
+                                  color: cherryTomato,
+                                )
+                            ),
+                          )
+                        ],
+                      )
                   )
                 ],
               ),
@@ -118,33 +138,23 @@ class _friend_infoState extends State<friend_info> {
 
 
           ),
-          SliverGrid(
-            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 200.0,
-              mainAxisSpacing: 10.0,
-              crossAxisSpacing: 10.0,
-              childAspectRatio: 4.0,
-            ),
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                return Container(
-                  alignment: Alignment.center,
-                  color: Colors.teal[100 * (index % 9)],
-                  child: Text('grid item $index'),
-                );
-              },
-              childCount: 20,
-            ),
-          ),
           SliverFixedExtentList(
             itemExtent: 50.0,
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
-                return Container(
+                var cont;
+
+
+
+                  cont = Container(
                   alignment: Alignment.center,
                   color: Colors.lightBlue[100 * (index % 9)],
                   child: Text('list item $index'),
-                );
+                  );
+
+
+
+                return cont;
               },
             ),
           ),
