@@ -9,10 +9,13 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   EdgeInsetsGeometry pad(int i) {
     if (i % 2 == 0)
-      return EdgeInsets.fromLTRB(10, 10, 5, 0);
+      return EdgeInsets.fromLTRB(15, 15, 10, 0);
     else
-      return EdgeInsets.fromLTRB(5, 10, 10, 0);
+      return EdgeInsets.fromLTRB(10, 15, 15, 0);
   }
+
+  var cherryTomato = const Color(0xffe94b3c);
+  var blackColor = const Color(0xff2d2926);
 
   call() {
     print('hello');
@@ -24,16 +27,26 @@ class _HomeState extends State<Home> {
     return MaterialApp(
         theme: ThemeData(
             // to give colors to theme
-            primaryColor: Colors.green[200]),
+            primaryColor: cherryTomato,
+        ),
         home: Scaffold(
           key: _scaf,
+          floatingActionButton: FloatingActionButton(
+            child: Icon(Icons.add),
+            onPressed: (){},
+            backgroundColor: cherryTomato,
+          ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
           drawer: Drawer(
-            child: Text('hello'),
+            child: SafeArea(
+              child: Text('hello'),
+            ),
           ),
           body: CustomScrollView(
             slivers: <Widget>[
               SliverAppBar(
                 pinned: false,
+
                 leading: IconButton(
                   icon: Icon(Icons.drag_handle),
                   onPressed: () {
@@ -47,16 +60,17 @@ class _HomeState extends State<Home> {
                 flexibleSpace: FlexibleSpaceBar(
                   collapseMode: CollapseMode.parallax,
                   background: Image(
-                    image: AssetImage('assets/photos/morning.jpeg'),
+                    image: AssetImage('assets/photos/night_sky.png'),
                     fit: BoxFit.cover,
-                  ),
+                  ) ,
                 ),
+
                 bottom: PreferredSize(
                     child: Row(
                       children: <Widget>[
                         Expanded(
                           child: Container(
-                            color: Colors.grey.shade200.withOpacity(0.6),
+                            //color: Colors.grey.shade200.withOpacity(0.6),
                             child: Text(
                               'Welcome, Ashilesh!',
                               overflow: TextOverflow.fade,
@@ -65,15 +79,18 @@ class _HomeState extends State<Home> {
                               style: TextStyle(
                                   fontFamily: "OpenSans",
                                   fontSize: 30,
-                                  color: Colors.black
+                                  color: Colors.white,
+
                               ),
                             ),
+                            padding: EdgeInsets.fromLTRB(0, 0, 0, 15),
                           ),
                         )
                       ],
                     ),
                   preferredSize: Size.fromHeight(30),
                 ),
+
               ),
               SliverGrid(
                 gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
@@ -85,6 +102,7 @@ class _HomeState extends State<Home> {
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
                     return Container(
+                      color: Colors.black,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: GestureDetector(
