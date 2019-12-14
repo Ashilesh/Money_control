@@ -3,6 +3,7 @@ import 'welcome.dart';
 import 'home.dart';
 import 'database.dart';
 import 'friend.dart';
+import 'add_friend.dart';
 
 
 void main() {
@@ -12,9 +13,15 @@ void main() {
 
   runApp(MaterialApp(
       theme: ThemeData(
-          primaryColor: blackColor
+          primaryColor: cherryTomato,
+          backgroundColor: blackColor,
+          appBarTheme: AppBarTheme(
+            color: blackColor
+          ),
+        fontFamily: "OpenSans"
+
       ),
-      home: friend_info())
+      home: Home())
   );
 }
 
