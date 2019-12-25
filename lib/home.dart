@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:flutter/material.dart';
+
 import 'package:money_control/add_friend.dart';
 
 class Home extends StatefulWidget {
@@ -20,6 +21,7 @@ class _HomeState extends State<Home> {
   var cherryTomato = const Color(0xffe94b3c);
   var blackColor = const Color(0xff2d2926);
 
+  // delete option in sidebar
   _delteAll(BuildContext context){
     return showDialog(context: context,builder: (context){
         return AlertDialog(
@@ -112,13 +114,13 @@ class _HomeState extends State<Home> {
                           Icon(
                             Icons.delete_forever,
                             color: cherryTomato,
-                            size: 30,
+                            size: 25,
                           ),
 
                           Opacity(
                             opacity: 0,
                             child: Container(
-                              width: 45,
+                              width: 55,
                             ),
                           ),
 
@@ -126,7 +128,7 @@ class _HomeState extends State<Home> {
                             'Delete',
                             style: TextStyle(
                                 color: cherryTomato,
-                                fontSize: 30
+                                fontSize: 25
                             ),
                           )
                         ],
@@ -146,13 +148,13 @@ class _HomeState extends State<Home> {
                           Icon(
                             Icons.error,
                             color: cherryTomato,
-                            size: 30,
+                            size: 25,
                           ),
 
                           Opacity(
                             opacity: 0,
                             child: Container(
-                              width: 45,
+                              width: 55,
                             ),
                           ),
 
@@ -160,7 +162,7 @@ class _HomeState extends State<Home> {
                             'About',
                             style: TextStyle(
                                 color: cherryTomato,
-                                fontSize: 30
+                                fontSize: 25
                             ),
                           )
                         ],
@@ -190,15 +192,24 @@ class _HomeState extends State<Home> {
   }
 
   final GlobalKey<ScaffoldState> _scaf = new GlobalKey<ScaffoldState>();
+
+  Future<String> getName() async{
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('User Name');
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    Future<String> userName = getName();
+
 
     return Scaffold(
       key: _scaf,
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: (){
-            Navigator.push(context, new MaterialPageRoute(builder: (context) => addFriend()));
+            Navigator.push(context, new MaterialPageRoute(builder: (context) => AddFriend()));
         },
         backgroundColor: cherryTomato,
       ),
@@ -228,29 +239,50 @@ class _HomeState extends State<Home> {
             ),
 
             bottom: PreferredSize(
+
               child: Row(
                 children: <Widget>[
                   Expanded(
                     child: Container(
                       //color: Colors.grey.shade200.withOpacity(0.6),
-                      child: Text(
-                        'Welcome, Ashilesh!',
-                        overflow: TextOverflow.fade,
+                      child: FutureBuilder(
+                        future: userName,
+                        builder: (BuildContext context,AsyncSnapshot<String> snapshot){
+                          if(snapshot.hasData){
+                            print('has Data ${snapshot.data}');
+                            return Text(
+                            'Welcome, ${snapshot.data}',
+                            overflow: TextOverflow.fade,
                         softWrap: true,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: "OpenSans",
                           fontSize: 30,
                           color: Colors.white,
-
-                        ),
+                          )
+                          );}
+                          else
+                            return Text('awiting result');
+                        },
                       ),
+//                      Text(
+//                        'Welcome, ' ,
+//                        overflow: TextOverflow.fade,
+//                        softWrap: true,
+//                        textAlign: TextAlign.center,
+//                        style: TextStyle(
+//                          fontFamily: "OpenSans",
+//                          fontSize: 30,
+//                          color: Colors.white,
+//
+//                        ),
+//                      ),
                       padding: EdgeInsets.fromLTRB(0, 0, 0, 15),
                     ),
                   )
                 ],
               ),
-              preferredSize: Size.fromHeight(30),
+              preferredSize: Size.fromHeight(50),
             ),
 
           ),
@@ -286,7 +318,7 @@ class _HomeState extends State<Home> {
                                   child: Container(
                                     color: Colors.grey.withOpacity(0.4),
                                     child: Text(
-                                      '$index Grid!',
+                                      '$index Grid!1111111111111',
                                       softWrap: true,
                                       overflow: TextOverflow.fade,
                                       textAlign: TextAlign.center,

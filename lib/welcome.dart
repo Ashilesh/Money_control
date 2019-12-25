@@ -6,8 +6,11 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'home.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyApp extends StatelessWidget {
+
+  final nameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +24,12 @@ class MyApp extends StatelessWidget {
 
           // floating action button
           floatingActionButton: FloatingActionButton(
-           onPressed : (){
+           onPressed : ()async{
+
+             final prefs = await SharedPreferences.getInstance();
+             prefs.setString('User Name', nameController.text);
+
+             print(nameController.text);
              print('click');
             Navigator.push(context, new MaterialPageRoute(builder: (context) => Home()));
            },
@@ -69,6 +77,7 @@ class MyApp extends StatelessWidget {
                                 padding: EdgeInsets.fromLTRB(22, 0, 22, 0),
 
                                 child: TextField(
+                                  controller: nameController,
                                   textInputAction: TextInputAction.done,
                                   textCapitalization: TextCapitalization.sentences,
                                   style:  TextStyle(

@@ -2,32 +2,35 @@ import 'dart:io';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as prefix0;
 import 'package:image_picker/image_picker.dart';
 import 'dart:ui';
 import 'package:image_cropper/image_cropper.dart';
+import 'add_friend2.dart';
+import 'package:path_provider/path_provider.dart';
 
-class addFriend extends StatefulWidget {
+class AddFriend extends StatefulWidget {
   @override
-  _addFriendState createState() => _addFriendState();
+  _AddFriendState createState() => _AddFriendState();
 }
 
-class _addFriendState extends State<addFriend> {
+class _AddFriendState extends State<AddFriend> {
 
   File _friendImage;
 
   Future getImage(ImageSource source) async{
     var image = await ImagePicker.pickImage(source: source);
+    
+    MediaQueryData query = MediaQuery.of(context);
 
     File croppedFile = await ImageCropper.cropImage(
         sourcePath: image.path,
         cropStyle: CropStyle.rectangle,
-        aspectRatioPresets: [
-        CropAspectRatioPreset.square,
-        CropAspectRatioPreset.ratio3x2,
-        CropAspectRatioPreset.original,
-        CropAspectRatioPreset.ratio4x3,
-        CropAspectRatioPreset.ratio16x9,
-        ],
+        aspectRatio: CropAspectRatio(
+          ratioX: query.size.width,
+          ratioY: query.size.height
+        ),
+        
         androidUiSettings: AndroidUiSettings(
             toolbarTitle: 'Cropper',
             toolbarColor: Colors.deepOrange,
@@ -48,21 +51,79 @@ class _addFriendState extends State<addFriend> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-       
-      floatingActionButton: FloatingActionButton(
-        onPressed: (){
-          getImage(ImageSource.gallery);
-        },
-        child: Icon(Icons.add_a_photo),
-      ),
-      body: Center(
-        child: _friendImage == null ?
-        Text('No Image selected')
-            : Container(
-          color: Colors.black,
-          child: Image.file(_friendImage,filterQuality: FilterQuality.high,),
-        )
+
+    return  Scaffold(
+
+      resizeToAvoidBottomInset: true,
+      backgroundColor: Colors.black,
+
+      body:Stack(
+        children: <Widget>[
+          Center(
+              child: _friendImage == null ?
+              Text('No image selected!', style: prefix0.TextStyle(color: Theme.of(context).primaryColor),)
+
+                  : Container(
+                color: Colors.black,
+                child: Image.file(_friendImage,filterQuality: FilterQuality.high,fit: BoxFit.fill,),
+              )
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.all(15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
+                  children: <Widget>[
+                    MaterialButton(
+                      height: 50,
+                      onPressed: () => getImage(ImageSource.gallery),
+                      child: Text(
+                        'Add Photo',
+                        style: prefix0.TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontSize: 20
+                        ),
+                      ),
+                      color: Theme.of(context).primaryColorDark,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(20))
+                      ),
+                    ),
+                    MaterialButton(
+                      height: 50,
+                      onPressed: (){
+
+                        Navigator.push(
+                            context,
+                            new MaterialPageRoute(builder: (context) => AddFriend2(
+                                friendImage: _friendImage )
+                            )
+                        );
+
+                      },
+                      child: Text(
+                        'Next',
+                        style: prefix0.TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontSize: 20
+                        ),
+                      ),
+                      color: Theme.of(context).primaryColorDark,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(20))
+                      ),
+                    )
+                  ],
+                ),
+              )
+            ],
+          )
+
+        ],
+
       ),
     );
   }

@@ -227,7 +227,7 @@ class _friend_infoState extends State<friend_info> {
               expandedHeight: height,
 
               bottom: PreferredSize(
-                preferredSize: Size.fromHeight(143),
+                preferredSize: Size.fromHeight(150),
 
                 // Name, give, take, amount
                 child: Column(
