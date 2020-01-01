@@ -1,7 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:money_control/Demo.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:async/async.dart';
+import 'Database.dart';
 
 // ignore: must_be_immutable
 class AddFriend2 extends StatelessWidget {
@@ -9,23 +15,15 @@ class AddFriend2 extends StatelessWidget {
   File friendImage;
   AddFriend2({Key key, @required this.friendImage}) : super(key:key);
 
-  Future<String> imagePath()async{
-    Directory dir = await getApplicationDocumentsDirectory();
-    String local = dir.path;
-
-    return '$local/assets/photos/beach_2_low.jpg';
-  }
-
-
   @override
   Widget build(BuildContext context) {
 
-    Future<String> img = imagePath();
-
+    final firstNameController = TextEditingController();
+    final lastNameController = TextEditingController();
 
     return Scaffold(
 
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton.extended(
         label: Text('Submit',style: TextStyle(color: Theme.of(context).primaryColor,fontSize: 20),),
@@ -33,21 +31,44 @@ class AddFriend2 extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(20))
         ),
-        onPressed: (){},
+        onPressed: ()async{
+          var img;
+          if(friendImage != null)
+            img = base64.encode(friendImage.readAsBytesSync());
+
+
+
+          await DBProvider.db.newClient(Client(
+              firstName: 'Ashilesh',
+              image: img,
+              lastName: 'Sonkusle', id: 8));
+
+          Navigator.push(
+              context,
+              new MaterialPageRoute(builder: (context) => Demo()
+              )
+          );
+        },
 
       ),
       backgroundColor: Colors.black,
       body: Stack(
         children: <Widget>[
-         friendImage == null ?
-         Container(
+          friendImage == null ?
+          Container(
             decoration: BoxDecoration(
                 image: DecorationImage(
                     image: AssetImage('assets/photos/beach_2_low.jpg'),
                     fit: BoxFit.cover)),
 
-         ) :
-          Image.file(friendImage),
+          ) :
+          Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: FileImage(friendImage),
+                    fit: BoxFit.cover)),
+
+          ),
 
           Center(
             child: Container(
@@ -63,8 +84,7 @@ class AddFriend2 extends StatelessWidget {
                 mainAxisSize: MainAxisSize.max,
                 children: <Widget>[
                   TextField(
-
-
+                    controller: firstNameController,
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 26
@@ -92,6 +112,7 @@ class AddFriend2 extends StatelessWidget {
                   ),
 
                   TextField(
+                    controller: lastNameController,
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 26

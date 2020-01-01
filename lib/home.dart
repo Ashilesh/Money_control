@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:shared_preferences/shared_preferences.dart';
-
-
 import 'package:money_control/add_friend.dart';
 
 class Home extends StatefulWidget {

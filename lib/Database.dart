@@ -27,7 +27,7 @@ class DBProvider {
   // when we start the app
   initDB() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, "TestDB.db");
+    String path = join(documentsDirectory.path, "Friend.db");
 
     print("in initDB");
 
@@ -37,7 +37,8 @@ class DBProvider {
               "id integer,"
               "first_name Text,"
               "last_name Text,"
-              "blocked BIT"
+              "blocked BIT,"
+              "image Text"
               ")");
         }
     );
@@ -45,27 +46,27 @@ class DBProvider {
 
   newClient(Client newClient) async{
 
-    print('new Client');
     final db = await database;
-    print('down database');
+    print('${newClient.image} image');
     var res = await db.rawInsert(
-        "insert into Client (id,first_name) values(${newClient.id},'${newClient.firstName}')"
+        "insert into Client (id,first_name,last_name,image) values(${newClient.id},'${newClient.firstName}',"
+            "'${newClient.lastName}','${newClient.image}')"
     );
 
+    print('completed insertion');
 
-    var res1 = await db.query("Client", where: "id = ?", whereArgs: [3]);
-
-    Client dumC = Client.fromMap(res1.first);
-
-    print('${dumC.firstName}');
     return res;
   }
 
-  getClient(int id) async{
+    Future<Client> getClient(int id) async{
     final db = await database;
+    
+    print('in getClient');
     var res = await db.query("Client", where: "id = ?", whereArgs: [id]);
 
-    return res.isNotEmpty ? Client.fromMap(res.first) : Null;
+    print("how something here");
+
+    return res.isNotEmpty ? Client.fromMap(res.first) : null;
   }
 }
 
@@ -89,25 +90,35 @@ class Client {
   String firstName;
   String lastName;
   bool blocked;
+  String image;
 
   Client({
     this.id,
     this.firstName,
     this.lastName,
     this.blocked,
+    this.image,
   });
 
-  factory Client.fromMap(Map<String, dynamic> json) => new Client(
-    id: json["id"],
-    firstName: json["first_name"],
-    lastName: json["last_name"],
-    blocked: json["blocked"] == 1,
-  );
+  factory Client.fromMap(Map<String, dynamic> json) {
 
+    return new Client(
+      id: json["id"],
+      firstName: json["first_name"],
+      lastName: json["last_name"],
+      blocked: json["blocked"] == 1,
+      image: json["image"],
+    );
+  }
   Map<String, dynamic> toMap() => {
     "id": id,
     "first_name": firstName,
     "last_name": lastName,
     "blocked": blocked,
+    "image": image,
   };
+
+  String show(){
+    return "${this.id} ${this.firstName} ${this.lastName} ${this.image}";
+  }
 }
