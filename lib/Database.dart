@@ -34,10 +34,10 @@ class DBProvider {
     return await openDatabase(path, version: 1, onOpen: (db){},
         onCreate: (Database db, int version) async{
           await db.execute("Create table Client ("
-              "id integer,"
+              "id integer PRIMARY KEY AUTOINCREMENT,"
               "first_name Text,"
               "last_name Text,"
-              "blocked BIT,"
+              "blocked BIT DEFAULT 1,"
               "image Text"
               ")");
         }
@@ -58,7 +58,7 @@ class DBProvider {
     return res;
   }
 
-    Future<Client> getClient(int id) async{
+  Future<Client> getClient(int id) async{
     final db = await database;
     
     print('in getClient');
@@ -67,6 +67,14 @@ class DBProvider {
     print("how something here");
 
     return res.isNotEmpty ? Client.fromMap(res.first) : null;
+  }
+  
+  Future getAll()async{
+    final db = await database;
+
+    var count = await db.rawQuery("SELECT * FROM Client");
+
+    return count;
   }
 }
 

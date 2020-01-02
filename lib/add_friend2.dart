@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:core';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,17 +38,17 @@ class AddFriend2 extends StatelessWidget {
             img = base64.encode(friendImage.readAsBytesSync());
 
 
-
-          await DBProvider.db.newClient(Client(
-              firstName: 'Ashilesh',
+          // Adding friends info to database
+         var a = await DBProvider.db.newClient(Client(
+              firstName: firstNameController.text,
               image: img,
-              lastName: 'Sonkusle', id: 8));
+              lastName: lastNameController.text ));
 
-          Navigator.push(
-              context,
-              new MaterialPageRoute(builder: (context) => Demo()
-              )
-          );
+         print('above insertion');
+          print('variable a :$a');
+
+
+          Navigator.pop(context, true);
         },
 
       ),

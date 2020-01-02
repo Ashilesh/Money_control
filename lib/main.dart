@@ -4,9 +4,14 @@ import 'home.dart';
 import 'friend.dart';
 import 'add_friend.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/services.dart';
 
 
 void main() {
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown
+  ]);
 
   var cherryTomato = const Color(0xffe94b3c);
   var blackColor = const Color(0xff2d2926);
@@ -15,7 +20,10 @@ void main() {
 
     final prefs = await SharedPreferences.getInstance();
 
-    return prefs.getString('User Name');
+    print('${prefs.getString('User Name')}  name');
+    String name = await prefs.getString('User Name');
+
+    return name == null ? '-': name;
   }
 
   Future name = checkName();
@@ -25,24 +33,28 @@ void main() {
           primaryColor: cherryTomato,
           primaryColorDark: blackColor,
           backgroundColor: blackColor,
+
           appBarTheme: AppBarTheme(
             color: blackColor
           ),
         fontFamily: "OpenSans"
 
       ),
-      home: AddFriend()
-//      FutureBuilder(
-//        future: name,
-//        builder: (BuildContext context,AsyncSnapshot snapshot){
-//          if(snapshot.data == null)
-//            return MyApp();
-//          else
-//            return Home();
-//
-//        },
-//      ))
-  ));
+      home:
+      FutureBuilder(
+        future: name,
+        builder: (BuildContext context,AsyncSnapshot snapshot){
+          if(snapshot.hasData){
+            if(snapshot.data == '-')
+              return MyApp();
+            else
+              return Home();
+          }
+          else
+            return CircularProgressIndicator();
+        },
+      )));
+
 }
 
 

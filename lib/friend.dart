@@ -1,14 +1,23 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'Database.dart';
 
 class friend_info extends StatefulWidget {
+  int id;
+  friend_info({Key key, @required this.id}): super(key:key);
   @override
-  _friend_infoState createState() => _friend_infoState();
+  _friend_infoState createState() => _friend_infoState(id);
 }
 
 class _friend_infoState extends State<friend_info> {
+
+  int id;
+  _friend_infoState(this.id);
+
+  // to get the value received from alertDialog
   FutureOr Function(String value) get onValue => null;
   var cherryTomato = const Color(0xffe94b3c);
   var blackColor = const Color(0xff2d2926);
@@ -38,7 +47,7 @@ class _friend_infoState extends State<friend_info> {
                   labelStyle: TextStyle(
                       fontWeight: FontWeight.w600
                   ),
-                  labelText: 'Amount'
+                  hintText: 'Amount'
               ),
               controller: customController,
               keyboardType: TextInputType.number,
@@ -53,7 +62,7 @@ class _friend_infoState extends State<friend_info> {
 
               ),
               decoration: new InputDecoration(
-                  labelText: 'Reason',
+                  hintText: ' Reason',
                 labelStyle: TextStyle(
                   fontWeight: FontWeight.w600
                 ),
@@ -112,7 +121,7 @@ class _friend_infoState extends State<friend_info> {
                   labelStyle: TextStyle(
                       fontWeight: FontWeight.w600
                   ),
-                  labelText: 'Amount'
+                  hintText: 'Amount'
               ),
               controller: customController,
               keyboardType: TextInputType.number,
@@ -127,7 +136,7 @@ class _friend_infoState extends State<friend_info> {
 
               ),
               decoration: new InputDecoration(
-                labelText: 'Reason',
+                hintText: ' Reason',
                 labelStyle: TextStyle(
                     fontWeight: FontWeight.w600
                 ),
@@ -216,174 +225,186 @@ class _friend_infoState extends State<friend_info> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
 
+    Future<Client> friend = DBProvider.db.getClient(id);
 
-    return Scaffold(
-      body: Builder(builder: (context){
-        return CustomScrollView(
-          slivers: <Widget>[
-            // Appbar
-            SliverAppBar(
-              pinned: true,
-              expandedHeight: height,
+    return FutureBuilder(
+      future: friend,
+      builder: (BuildContext context, AsyncSnapshot<Client> snapshot){
+        if(snapshot.hasData)
+          return Scaffold(
+            resizeToAvoidBottomInset: false,
+            body: Builder(builder: (context){
+              return CustomScrollView(
+                slivers: <Widget>[
+                  // Appbar
+                  SliverAppBar(
+                    pinned: true,
+                    expandedHeight: height,
 
-              bottom: PreferredSize(
-                preferredSize: Size.fromHeight(150),
+                    bottom: PreferredSize(
+                      preferredSize: Size.fromHeight(150),
 
-                // Name, give, take, amount
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Row(
-                      textDirection: TextDirection.rtl,
-                      children: <Widget>[
-                        Text('Ashilesh Sonkusle',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: "OpenSans",
-                              fontSize: 30
-                          ),
-                        )
-                      ],
-                    ),
-                    Row(
-                      textDirection: TextDirection.rtl,
-                      children: <Widget>[
-                        Text('- \u20B9 540',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: "OpenSans",
-                              fontSize: 30
-                          ),
-                        )
-                      ],
-                    ),
-                    Container(
-                      height: 15,
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: FlatButton(
-                              child: Text('Give',
+                      // Name, give, take, amount
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Row(
+                            textDirection: TextDirection.rtl,
+                            children: <Widget>[
+                              Text('${snapshot.data.firstName} ${snapshot.data.lastName}',
                                 style: TextStyle(
-                                    color: cherryTomato,
+                                    color: Colors.white,
                                     fontFamily: "OpenSans",
                                     fontSize: 30
                                 ),
-                              ),
-                              onPressed: () {
-                                giveAlertDialog(context).then((onValue){
-                                  SnackBar mySnackbar = SnackBar(
-                                    content: Text('Amount $onValue'),
-                                  );
-                                  Scaffold.of(context).showSnackBar(mySnackbar);
-                                  print('in pressed!');
-                                });
-                              }
+                              )
+                            ],
                           ),
-                        ),
-                        Expanded(
-                          child: FlatButton(
-                            child: Text('Take',
-                              style: TextStyle(
-                                  color: Colors.green,
-                                  fontFamily: "OpenSans",
-                                  fontSize: 30
-                              ),
-                            ),
-                            onPressed: () {
-                              takeAlertDialog(context).then((onValue){
-                                SnackBar mySnackbar = SnackBar(
-                                  content: Text('Amount received'),
-                                );
-                              });
-                            },
+                          Row(
+                            textDirection: TextDirection.rtl,
+                            children: <Widget>[
+                              Text('- \u20B9 540',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: "OpenSans",
+                                    fontSize: 30
+                                ),
+                              )
+                            ],
                           ),
-                        )
-                      ],
-                    ),
-                    Container(
-                      height: 10,
-                    ),
-                    Container(
-                        alignment: Alignment.center,
+                          Container(
+                            height: 15,
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: FlatButton(
+                                    child: Text('Give',
+                                      style: TextStyle(
+                                          color: cherryTomato,
+                                          fontFamily: "OpenSans",
+                                          fontSize: 30
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      giveAlertDialog(context).then((onValue){
+                                        SnackBar mySnackbar = SnackBar(
+                                          content: Text('Amount $onValue'),
+                                        );
+                                        Scaffold.of(context).showSnackBar(mySnackbar);
+                                        print('in pressed!');
+                                      });
+                                    }
+                                ),
+                              ),
+                              Expanded(
+                                child: FlatButton(
+                                  child: Text('Take',
+                                    style: TextStyle(
+                                        color: Colors.green,
+                                        fontFamily: "OpenSans",
+                                        fontSize: 30
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    takeAlertDialog(context).then((onValue){
+                                      SnackBar mySnackbar = SnackBar(
+                                        content: Text('Amount received'),
+                                      );
+                                    });
+                                  },
+                                ),
+                              )
+                            ],
+                          ),
+                          Container(
+                            height: 10,
+                          ),
+                          Container(
+                              alignment: Alignment.center,
 
-                        color: Colors.transparent,
-                        child: Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: ClipRRect(
-                                  borderRadius: BorderRadius.only(topRight: Radius.circular(30),topLeft: Radius.circular(30)),
+                              color: Colors.transparent,
+                              child: Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: ClipRRect(
+                                        borderRadius: BorderRadius.only(topRight: Radius.circular(30),topLeft: Radius.circular(30)),
 
-                                  child: Container(
-                                    height: 40,
-                                    color: cherryTomato,
+                                        child: Container(
+                                          height: 40,
+                                          color: cherryTomato,
+                                        )
+                                    ),
                                   )
-                              ),
-                            )
-                          ],
-                        )
-                    )
-                  ],
-                ),
-              ),
+                                ],
+                              )
+                          )
+                        ],
+                      ),
+                    ),
 
-              // setting icon
-              actions: <Widget>[
-                Container(
-                    padding: EdgeInsets.fromLTRB(0, 0, 15, 0),
-                    child: IconButton(
-                      icon: Icon(Icons.delete),
-                      iconSize: 27,
-                      color: Colors.white,
-                      onPressed: (){deleteAlertDialog(context);},
-                    )
-                )
-              ],
+                    // setting icon
+                    actions: <Widget>[
+                      Container(
+                          padding: EdgeInsets.fromLTRB(0, 0, 15, 0),
+                          child: IconButton(
+                            icon: Icon(Icons.delete),
+                            iconSize: 27,
+                            color: Colors.white,
+                            onPressed: (){deleteAlertDialog(context);},
+                          )
+                      )
+                    ],
 
-              // background image, parallax
-              flexibleSpace: FlexibleSpaceBar(
-                collapseMode: CollapseMode.parallax,
-                //gradient image
-                background: ShaderMask(
-                  shaderCallback: (rect) {
-                    return LinearGradient(
-                      begin: Alignment.center,
-                      end: Alignment.bottomCenter,
-                      colors: [Colors.black, Colors.transparent],
-                    ).createShader(Rect.fromLTRB(0, 0, rect.width, rect.height));
-                  },
-                  blendMode: BlendMode.dstIn,
-                  child: Image.asset(
-                    'assets/photos/beach_2_low.jpg',
-                    fit: BoxFit.cover,
+                    // background image, parallax
+                    flexibleSpace: FlexibleSpaceBar(
+                      collapseMode: CollapseMode.parallax,
+                      //gradient image
+                      background: ShaderMask(
+                        shaderCallback: (rect) {
+                          return LinearGradient(
+                            begin: Alignment.center,
+                            end: Alignment.bottomCenter,
+                            colors: [Colors.black, Colors.transparent],
+                          ).createShader(Rect.fromLTRB(0, 0, rect.width, rect.height));
+                        },
+                        blendMode: BlendMode.dstIn,
+                        child: snapshot.data.image == 'null'?
+                        Image.asset(
+                          'assets/photos/beach_2_low.jpg',
+                          fit: BoxFit.cover,
+                        ):
+                        Image.memory(Base64Decoder().convert(snapshot.data.image), fit: BoxFit.cover,),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ),
 
-            // List
-            SliverFixedExtentList(
-              itemExtent: 50.0,
-              delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                  var cont;
+                  // List
+                  SliverFixedExtentList(
+                    itemExtent: 50.0,
+                    delegate: SliverChildBuilderDelegate(
+                          (BuildContext context, int index) {
+                        var cont;
 
 
 
-                  cont = Container(
-                    alignment: Alignment.center,
-                    color: Colors.lightBlue[100 * (index % 9)],
-                    child: Text('list item $index'),
-                  );
+                        cont = Container(
+                          alignment: Alignment.center,
+                          color: Colors.lightBlue[100 * (index % 9)],
+                          child: Text('list item $index'),
+                        );
 
-                  return cont;
-                },
-              ),
-            ),
-          ],
-        );
-      },),
+                        return cont;
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },),
+          );
+        else
+          return Center(child: CircularProgressIndicator(),);
+      },
     );
   }
 }

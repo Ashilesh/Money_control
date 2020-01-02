@@ -94,14 +94,16 @@ class _AddFriendState extends State<AddFriend> {
                     ),
                     MaterialButton(
                       height: 50,
-                      onPressed: (){
+                      onPressed: ()async{
 
-                        Navigator.push(
+                        bool success =  await Navigator.push<bool>(
                             context,
                             new MaterialPageRoute(builder: (context) => AddFriend2(
                                 friendImage: _friendImage )
                             )
                         );
+
+                        Navigator.pop(context, success);
 
                       },
                       child: Text(
