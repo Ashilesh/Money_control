@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'Database.dart';
+import 'Database_log.dart';
 
 class friend_info extends StatefulWidget {
   int id;
@@ -25,8 +26,9 @@ class _friend_infoState extends State<friend_info> {
   // give alert dialog
   Future<String> giveAlertDialog(BuildContext context){
 
-    TextEditingController customController = new TextEditingController();
-
+    TextEditingController customControllerAmount = new TextEditingController();
+    TextEditingController customControllerReason = new TextEditingController();
+    
     return showDialog(context: context, builder: (context){
       return AlertDialog(
         title: Text("You have to give to your friend",
@@ -49,13 +51,14 @@ class _friend_infoState extends State<friend_info> {
                   ),
                   hintText: 'Amount'
               ),
-              controller: customController,
+              controller: customControllerAmount,
               keyboardType: TextInputType.number,
               inputFormatters: <TextInputFormatter>[
                 WhitelistingTextInputFormatter.digitsOnly     //only no can be entered
               ],
             ),
             TextField(
+              controller: customControllerReason,
               style: TextStyle(
                 fontSize: 20,
                 fontFamily: "OpenSans",
@@ -90,7 +93,12 @@ class _friend_infoState extends State<friend_info> {
               ),
             color: Colors.redAccent,
 
-            onPressed: (){Navigator.of(context).pop(customController.text.toString());},
+            onPressed: ()async{
+              int amount = int.parse(customControllerAmount.text.toString());
+              amount = -amount;
+              await DBLog.db.newLog(Log(amount: amount,reason: customControllerReason.text.toString(),id: id));
+              Navigator.of(context).pop("-${customControllerAmount.text.toString()}");
+              },
           )
         ],
       );
@@ -99,7 +107,8 @@ class _friend_infoState extends State<friend_info> {
 
   // take alert dialog
   Future<String> takeAlertDialog(BuildContext context){
-    TextEditingController customController = new TextEditingController();
+    TextEditingController customControllerAmount = new TextEditingController();
+    TextEditingController customControllerReason = new TextEditingController();
 
     return showDialog(context: context, builder: (context){
       return AlertDialog(
@@ -123,20 +132,21 @@ class _friend_infoState extends State<friend_info> {
                   ),
                   hintText: 'Amount'
               ),
-              controller: customController,
+              controller: customControllerAmount,
               keyboardType: TextInputType.number,
               inputFormatters: <TextInputFormatter>[
                 WhitelistingTextInputFormatter.digitsOnly     //only no can be entered
               ],
             ),
             TextField(
+              controller: customControllerReason,
               style: TextStyle(
                 fontSize: 20,
                 fontFamily: "OpenSans",
 
               ),
               decoration: new InputDecoration(
-                hintText: ' Reason',
+                hintText: '  Reason',
                 labelStyle: TextStyle(
                     fontWeight: FontWeight.w600
                 ),
@@ -164,7 +174,12 @@ class _friend_infoState extends State<friend_info> {
             ),
             color: Colors.green,
 
-            onPressed: (){Navigator.of(context).pop(customController.text.toString());},
+            onPressed: () async{
+              int amount = int.parse(customControllerAmount.text.toString());
+
+              await DBLog.db.newLog(Log(id: id,reason: customControllerReason.text.toString(),amount: amount));
+              Navigator.of(context).pop(customControllerAmount.text.toString());
+              },
           )
         ],
       );
@@ -199,7 +214,10 @@ class _friend_infoState extends State<friend_info> {
                           fontFamily: "OpenSans"
                       ),
                     ),
-                    onPressed: (){print('No');},
+                    onPressed: (){
+                      print('No');
+                      Navigator.of(context).pop();
+                      },
                   ),
                   MaterialButton(
                     child: Text(
@@ -209,7 +227,11 @@ class _friend_infoState extends State<friend_info> {
                           fontFamily: "OpenSans"
                       ),
                     ),
-                    onPressed: (){print('No');},
+                    onPressed: ()async{
+                      await DBProvider.db.updateBlocked(id);
+                      int i = 0;
+                      Navigator.of(context).popUntil((_)=>i++ >= 2);
+                      },
                   )
                 ],
               ),
@@ -226,14 +248,21 @@ class _friend_infoState extends State<friend_info> {
     double height = MediaQuery.of(context).size.height;
 
     Future<Client> friend = DBProvider.db.getClient(id);
+    Future friendLogs = DBLog.db.getLogs(id);
+
+
 
     return FutureBuilder(
-      future: friend,
-      builder: (BuildContext context, AsyncSnapshot<Client> snapshot){
+      future: Future.wait([
+        friend,
+        friendLogs
+      ]),
+      builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot){
         if(snapshot.hasData)
           return Scaffold(
             resizeToAvoidBottomInset: false,
             body: Builder(builder: (context){
+              Client fr = snapshot.data[0];
               return CustomScrollView(
                 slivers: <Widget>[
                   // Appbar
@@ -251,7 +280,7 @@ class _friend_infoState extends State<friend_info> {
                           Row(
                             textDirection: TextDirection.rtl,
                             children: <Widget>[
-                              Text('${snapshot.data.firstName} ${snapshot.data.lastName}',
+                              Text('${fr.firstName} ${fr.lastName}',
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontFamily: "OpenSans",
@@ -263,7 +292,7 @@ class _friend_infoState extends State<friend_info> {
                           Row(
                             textDirection: TextDirection.rtl,
                             children: <Widget>[
-                              Text('- \u20B9 540',
+                              Text('${fr.amount} \u20B9',
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontFamily: "OpenSans",
@@ -289,10 +318,12 @@ class _friend_infoState extends State<friend_info> {
                                     onPressed: () {
                                       giveAlertDialog(context).then((onValue){
                                         SnackBar mySnackbar = SnackBar(
-                                          content: Text('Amount $onValue'),
+                                          backgroundColor: Theme.of(context).primaryColorDark,
+                                          content: Text('Amount $onValue added',
+                                            style: TextStyle(color: Theme.of(context).primaryColor),),
                                         );
-                                        Scaffold.of(context).showSnackBar(mySnackbar);
-                                        print('in pressed!');
+                                        if(onValue != null)
+                                          Scaffold.of(context).showSnackBar(mySnackbar);
                                       });
                                     }
                                 ),
@@ -309,8 +340,12 @@ class _friend_infoState extends State<friend_info> {
                                   onPressed: () {
                                     takeAlertDialog(context).then((onValue){
                                       SnackBar mySnackbar = SnackBar(
-                                        content: Text('Amount received'),
+                                        backgroundColor: Theme.of(context).primaryColorDark,
+                                        content: Text('Amount $onValue added',
+                                          style: TextStyle(color: Theme.of(context).primaryColor),),
                                       );
+                                      if(onValue != null)
+                                        Scaffold.of(context).showSnackBar(mySnackbar);
                                     });
                                   },
                                 ),
@@ -369,33 +404,24 @@ class _friend_infoState extends State<friend_info> {
                           ).createShader(Rect.fromLTRB(0, 0, rect.width, rect.height));
                         },
                         blendMode: BlendMode.dstIn,
-                        child: snapshot.data.image == 'null'?
+                        child: fr.image == 'null'?
                         Image.asset(
-                          'assets/photos/beach_2_low.jpg',
+                          'assets/photos/beach_2.jpg',
                           fit: BoxFit.cover,
                         ):
-                        Image.memory(Base64Decoder().convert(snapshot.data.image), fit: BoxFit.cover,),
+                        Image.memory(Base64Decoder().convert(fr.image), fit: BoxFit.cover,),
                       ),
                     ),
                   ),
 
                   // List
-                  SliverFixedExtentList(
-                    itemExtent: 50.0,
-                    delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                        var cont;
-
-
-
-                        cont = Container(
-                          alignment: Alignment.center,
-                          color: Colors.lightBlue[100 * (index % 9)],
-                          child: Text('list item $index'),
-                        );
-
-                        return cont;
-                      },
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate((BuildContext context,int index){
+                      return ListTile(
+                        title: Text('${snapshot.data[1][snapshot.data[1].length - index - 1]["amount"]}'),
+                      ) ;
+                    },
+                      childCount: snapshot.data[1].length
                     ),
                   ),
                 ],

@@ -37,8 +37,9 @@ class DBProvider {
               "id integer PRIMARY KEY AUTOINCREMENT,"
               "first_name Text,"
               "last_name Text,"
-              "blocked BIT DEFAULT 1,"
-              "image Text"
+              "blocked BIT DEFAULT 0,"
+              "image Text,"
+              "amount integer DEFAULT 0"
               ")");
         }
     );
@@ -68,13 +69,37 @@ class DBProvider {
 
     return res.isNotEmpty ? Client.fromMap(res.first) : null;
   }
+
+  Future updateAmount(int id , int amount)async{
+    final db = await database;
+
+    var res = await db.rawQuery("Update Client set amount = amount + $amount where id = $id");
+
+    return res;
+  }
+
+  Future updateBlocked(int id)async{
+    final db = await database;
+
+    var res = await db.rawQuery("Update Client set blocked = 1 where id = $id");
+
+    return res;
+  }
   
   Future getAll()async{
     final db = await database;
 
-    var count = await db.rawQuery("SELECT * FROM Client");
+    var count = await db.rawQuery("SELECT * FROM Client where blocked = 0");
 
     return count;
+  }
+  
+  Future deleteAll() async{
+    final db = await database;
+    
+    var res = await db.rawQuery("Delete from Client");
+
+    return res;
   }
 }
 
@@ -99,6 +124,7 @@ class Client {
   String lastName;
   bool blocked;
   String image;
+  int amount;
 
   Client({
     this.id,
@@ -106,6 +132,7 @@ class Client {
     this.lastName,
     this.blocked,
     this.image,
+    this.amount,
   });
 
   factory Client.fromMap(Map<String, dynamic> json) {
@@ -116,6 +143,7 @@ class Client {
       lastName: json["last_name"],
       blocked: json["blocked"] == 1,
       image: json["image"],
+      amount: json["amount"],
     );
   }
   Map<String, dynamic> toMap() => {
@@ -124,6 +152,7 @@ class Client {
     "last_name": lastName,
     "blocked": blocked,
     "image": image,
+    "amount": amount,
   };
 
   String show(){

@@ -5,6 +5,7 @@ import 'friend.dart';
 import 'add_friend.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
+import 'Database_log.dart';
 
 
 void main() {
@@ -26,7 +27,12 @@ void main() {
     return name == null ? '-': name;
   }
 
+
+
   Future name = checkName();
+
+
+
 
   runApp(MaterialApp(
       theme: ThemeData(
@@ -41,6 +47,17 @@ void main() {
 
       ),
       home:
+//      FutureBuilder(
+//        future: res_log,
+//        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot){
+//          if(snapshot.hasData)
+//            return Text('query received!', style: TextStyle(color: Theme.of(context).primaryColor),);
+//          else
+//            return Center(
+//              child: CircularProgressIndicator(),
+//            );
+//        },
+//      )));
       FutureBuilder(
         future: name,
         builder: (BuildContext context,AsyncSnapshot snapshot){

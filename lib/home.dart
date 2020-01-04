@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as prefix0;
+import 'package:money_control/Database_log.dart';
 import 'dart:convert';
 import 'dart:ui';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,6 +23,7 @@ class _HomeState extends State<Home> {
 
   var cherryTomato = const Color(0xffe94b3c);
   var blackColor = const Color(0xff2d2926);
+  Future friends;
 
   // delete option in sidebar
   _delteAll(BuildContext context){
@@ -57,7 +59,10 @@ class _HomeState extends State<Home> {
                             color: cherryTomato
                           ),
                         ),
-                        onPressed: (){print('No');},
+                        onPressed: (){
+                          print('No');
+                          Navigator.of(context).pop();
+                          },
                       ),
                       MaterialButton(
                         child: Text(
@@ -68,7 +73,12 @@ class _HomeState extends State<Home> {
                             color: cherryTomato
                           ),
                         ),
-                        onPressed: (){print('yes');},
+                        onPressed: ()async{
+                          print('yes');
+                          await DBProvider.db.deleteAll();
+                          await DBLog.db.deleteAll();
+                          Navigator.of(context).pop();
+                          },
                       )
                     ],
                   ),
@@ -78,7 +88,9 @@ class _HomeState extends State<Home> {
 
         );
     }
-    );
+    ).then((_) {setState(() {
+
+    });});
   }
 
   _drawer(BuildContext context){
@@ -206,8 +218,9 @@ class _HomeState extends State<Home> {
 
     Future<String> userName = getName();
 
-    Future friends = DBProvider.db.getAll();
+    friends = DBProvider.db.getAll();
 
+//    _scaf.currentState.removeCurrentSnackBar();
 
     return Scaffold(
       key: _scaf,
@@ -291,6 +304,19 @@ class _HomeState extends State<Home> {
                     ),
 
                   ),
+                  snapshot.data[1].length ==0 ?
+                  SliverFillRemaining(
+                    child: Center(
+                      child: Text("Press '+' to add friends",
+                        style: TextStyle(color: Colors.grey[700],
+                          fontSize: 20,
+
+
+                        ),
+                      ),
+
+                    ),
+                  ) :
                   SliverGrid(
 
                     gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
@@ -308,14 +334,14 @@ class _HomeState extends State<Home> {
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.push(context,
-                                new MaterialPageRoute(builder: (Context) => friend_info(id: snapshot.data[1][index]["id"])));
+                                    new MaterialPageRoute(builder: (context) => friend_info(id: snapshot.data[1][index]["id"])));
                               },
                               child: Stack(
                                 fit: StackFit.expand,
                                 children: <Widget>[
                                   snapshot.data[1][index]["image"] == 'null'?
                                   Image(
-                                    image: AssetImage('assets/photos/beach_1.jpg'),
+                                    image: AssetImage('assets/photos/beach_2_low.jpg'),
                                     fit: BoxFit.cover,
                                   ):
                                   Image.memory(Base64Decoder().convert(snapshot.data[1][index]["image"]),fit: BoxFit.cover,),
